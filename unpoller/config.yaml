@@ -1,5 +1,6 @@
 ---
 name: UnPoller
+# renovate: datasource=docker depName=ghcr.io/unpoller/unpoller
 version: 5.5.0
 slug: unpoller
 description: |
