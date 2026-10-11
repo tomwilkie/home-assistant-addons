@@ -1,0 +1,23 @@
+name: Renovate changelog
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  changelog:
+    if: startsWith(github.head_ref, 'renovate/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            This Renovate PR bumps an add-on version in */config.yaml.
+            If that add-on's CHANGELOG.md has no entry for the new version, add one at the top
+            matching the existing format, summarising the upstream release notes
+            (gh release view <tag> -R unpoller/unpoller). Commit and push to this branch.

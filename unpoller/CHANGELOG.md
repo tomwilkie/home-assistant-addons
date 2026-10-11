@@ -1,5 +1,11 @@
 # Changelog
 
+## unpoller 5.5.1 - 2026-10-11
+
+- Update ghcr.io/unpoller/unpoller to v5.5.1
+  - Keep uplink and speedtest metrics when stat is missing
+  - Bump github.com/unpoller/unifi/v6 to v6.3.1
+
 ## unpoller 5.5.0 - 2026-10-02
 
 Copied from [bluemaex/home-assistant-addons](https://github.com/bluemaex/home-assistant-addons/tree/main/unpoller)
