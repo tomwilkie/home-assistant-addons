@@ -18,6 +18,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: 'renovate'
+          claude_args: '--allowedTools "Edit,Bash(gh release view:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*)"'
           prompt: |
             This Renovate PR bumps an add-on version in */config.yaml.
             If that add-on's CHANGELOG.md has no entry for the new version, add one at the top
