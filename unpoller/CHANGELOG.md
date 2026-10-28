@@ -1,5 +1,11 @@
 # Changelog
 
+## unpoller 5.8.3 - 2026-10-28
+
+- Update ghcr.io/unpoller/unpoller to v5.8.3
+  - Read the upgradable key for switch firmware updates (datadogunifi)
+  - Bump docker/login-action
+
 ## unpoller 5.5.1 - 2026-10-11
 
 - Update ghcr.io/unpoller/unpoller to v5.5.1
