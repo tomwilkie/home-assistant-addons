@@ -5,6 +5,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 jobs:
   changelog:
     if: startsWith(github.head_ref, 'renovate/')
@@ -16,6 +17,7 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_bots: 'renovate'
           prompt: |
             This Renovate PR bumps an add-on version in */config.yaml.
             If that add-on's CHANGELOG.md has no entry for the new version, add one at the top
