@@ -1,7 +1,7 @@
 ---
 name: UnPoller
 # renovate: datasource=docker depName=ghcr.io/unpoller/unpoller
-version: 5.5.1
+version: 5.8.3
 slug: unpoller
 description: |
   Collect your UniFi controller data and report it to an InfluxDB instance, or export it for Prometheus collection.
