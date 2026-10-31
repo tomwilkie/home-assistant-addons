@@ -8,7 +8,6 @@ description: |
 arch:
   - aarch64
   - amd64
-  - armv7
 startup: system
 url: https://github.com/tomwilkie/home-assistant-addons/tree/main/unpoller
 init: false
@@ -18,7 +17,8 @@ ports_description:
   9130/tcp: Unpoller Prometheus Endpoint
 panel_icon: mdi:router-network
 map:
-  - config
+  - type: homeassistant_config
+    path: /config
 options:
   log_level: info
   dynamic_configuration_path: "/config/addons/unpoller/up.conf"
