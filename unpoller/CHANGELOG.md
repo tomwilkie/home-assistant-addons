@@ -1,5 +1,12 @@
 # Changelog
 
+## unpoller 5.9.0 - 2026-10-31
+
+- Update ghcr.io/unpoller/unpoller to v5.9.0
+  - Expose UniFi OS console update availability (prometheus)
+  - Keep configured scrapes independent of optional metrics (inputunifi)
+  - Use released UniFi library v6.6.0
+
 ## unpoller 5.8.3 - 2026-10-28
 
 - Update ghcr.io/unpoller/unpoller to v5.8.3
