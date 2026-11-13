@@ -1,5 +1,13 @@
 # Changelog
 
+## unpoller 5.9.1 - 2026-11-02
+
+- Update ghcr.io/unpoller/unpoller to v5.9.1
+  - Do not apply slot-specific data plans to other SIMs
+  - Export U5G APN, cellular addressing and data-plan metrics
+  - Export UAP uplink parent, mesh RSSI/signal and PHY rates (promunifi)
+  - Use released UniFi library v6.6.1
+
 ## unpoller 5.9.0 - 2026-10-31
 
 - Update ghcr.io/unpoller/unpoller to v5.9.0
