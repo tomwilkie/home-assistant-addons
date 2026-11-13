@@ -18,3 +18,11 @@ metrics for Prometheus or InfluxDB. Copied from
 
 Home Assistant builds this add-on locally from its Dockerfile; there is no
 prebuilt image.
+
+### [Homebridge](./homebridge)
+
+[Homebridge](https://github.com/homebridge/homebridge) exposes non-HomeKit
+devices to Apple Home through plugins. Home Assistant pulls the official
+[homebridge/homebridge](https://hub.docker.com/r/homebridge/homebridge) image.
+Based on
+[tronikos/home-assistant-addons](https://github.com/tronikos/home-assistant-addons/tree/main/homebridge).

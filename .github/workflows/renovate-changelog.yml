@@ -23,4 +23,7 @@ jobs:
             This Renovate PR bumps an add-on version in */config.yaml.
             If that add-on's CHANGELOG.md has no entry for the new version, add one at the top
             matching the existing format, summarising the upstream release notes
-            (gh release view <tag> -R unpoller/unpoller). Commit and push to this branch.
+            (gh release view <tag> -R <upstream repo>). Upstream repos:
+            - unpoller: unpoller/unpoller
+            - homebridge: homebridge/docker-homebridge
+            Commit and push to this branch.

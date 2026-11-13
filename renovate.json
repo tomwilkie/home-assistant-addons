@@ -4,8 +4,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/unpoller/config.yaml/"],
-      "matchStrings": ["# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\nversion: (?<currentValue>\\S+)"],
+      "managerFilePatterns": ["/(^|/)config\\.yaml$/"],
+      "matchStrings": ["# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\nversion: \"?(?<currentValue>[^\"\\s]+)\"?"],
       "extractVersionTemplate": "^v?(?<version>.*)$"
     }
   ],
@@ -13,6 +13,10 @@
     {
       "matchPackageNames": ["ghcr.io/unpoller/unpoller"],
       "groupName": "unpoller"
+    },
+    {
+      "matchPackageNames": ["homebridge/homebridge"],
+      "versioning": "regex:^(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})$"
     }
   ]
 }
