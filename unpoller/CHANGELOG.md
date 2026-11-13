@@ -1,5 +1,11 @@
 # Changelog
 
+## unpoller 5.9.5 - 2026-11-11
+
+- Update ghcr.io/unpoller/unpoller to v5.9.5
+  - Export PDU outlet relay_state and cycle_enabled (promunifi)
+  - Bump dependencies
+
 ## unpoller 5.9.1 - 2026-11-02
 
 - Update ghcr.io/unpoller/unpoller to v5.9.1
