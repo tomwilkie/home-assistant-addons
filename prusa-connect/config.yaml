@@ -1,0 +1,26 @@
+name: Prusa Connect
+# renovate: datasource=github-releases depName=prusa3d/prusa-connect
+version: "0.1.0-beta.1"
+slug: prusa-connect
+description: Prusa Connect - a local server for your 3D printers
+arch:
+  - aarch64
+  - amd64
+startup: services
+url: https://github.com/tomwilkie/home-assistant-addons/tree/main/prusa-connect
+init: false
+host_network: true
+ports:
+  8080/tcp: 8080
+ports_description:
+  8080/tcp: Web UI, REST API and printer connections
+webui: http://[HOST]:[PORT:8080]
+panel_icon: mdi:printer-3d
+map:
+  - type: app_config
+    path: /prusa-connect
+    read_only: false
+options:
+  log_level: info
+schema:
+  log_level: list(debug|info|warn|error)
