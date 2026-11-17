@@ -26,4 +26,5 @@ jobs:
             (gh release view <tag> -R <upstream repo>). Upstream repos:
             - unpoller: unpoller/unpoller
             - homebridge: homebridge/docker-homebridge
+            - prusa-connect: prusa3d/prusa-connect
             Commit and push to this branch.

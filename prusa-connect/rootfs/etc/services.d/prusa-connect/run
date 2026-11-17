@@ -1,0 +1,24 @@
+#!/usr/bin/with-contenv bashio
+
+LOG_LEVEL=$(bashio::config 'log_level')
+
+# The server's own updater would replace the binary inside this container and
+# then migrate the database past what the add-on's version can read. Home
+# Assistant updates the add-on instead, so the first start writes a config.yaml
+# that switches the updater off. Edit or delete the file as you like; it is not
+# written again while it exists.
+if [ ! -f config/config.yaml ]; then
+    bashio::log.info "Writing config/config.yaml with the server's own updater switched off"
+    mkdir -p config
+    cat > config/config.yaml <<'YAML'
+# Written by the Prusa Connect add-on on first start. Every key set here wins
+# over the setup wizard, and the wizard shows it as fixed. Home Assistant
+# updates the server, so its own updater is off.
+core:
+  upgrade:
+    enabled: false
+YAML
+fi
+
+bashio::log.info "Starting Prusa Connect..."
+exec /usr/local/bin/prusa-connect -log-level "${LOG_LEVEL}"

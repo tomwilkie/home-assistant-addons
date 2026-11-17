@@ -26,3 +26,11 @@ devices to Apple Home through plugins. Home Assistant pulls the official
 [homebridge/homebridge](https://hub.docker.com/r/homebridge/homebridge) image.
 Based on
 [tronikos/home-assistant-addons](https://github.com/tronikos/home-assistant-addons/tree/main/homebridge).
+
+### [Prusa Connect](./prusa-connect)
+
+[Prusa Connect](https://github.com/prusa3d/prusa-connect) is Prusa's
+self-hosted server for 3D printers: the printers connect to it on your own
+network, and you use them from its web app and API. Prusa publishes no
+container image, so Home Assistant builds this add-on locally from the release
+binary on GitHub.
