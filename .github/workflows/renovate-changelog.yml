@@ -17,6 +17,9 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Push with the job's own token so the changelog commit does not
+          # trigger a second round of workflow runs as github-actions[bot].
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           allowed_bots: 'renovate'
           claude_args: '--allowedTools "Edit,Bash(gh release view:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*)"'
           prompt: |
