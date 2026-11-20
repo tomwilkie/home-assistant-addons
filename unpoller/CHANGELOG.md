@@ -1,5 +1,10 @@
 # Changelog
 
+## unpoller 5.9.6 - 2026-11-20
+
+- Update ghcr.io/unpoller/unpoller to v5.9.6
+  - Bump dependencies (all group, 5 updates)
+
 ## unpoller 5.9.5 - 2026-11-11
 
 - Update ghcr.io/unpoller/unpoller to v5.9.5
