@@ -1,5 +1,10 @@
 # Changelog
 
+## unpoller 5.10.0 - 2026-11-22
+
+- Update ghcr.io/unpoller/unpoller to v5.10.0
+  - Add TLS, client certificates and basic auth via exporter-toolkit web config (promunifi)
+
 ## unpoller 5.9.6 - 2026-11-20
 
 - Update ghcr.io/unpoller/unpoller to v5.9.6
