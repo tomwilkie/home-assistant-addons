@@ -1,5 +1,11 @@
 # Changelog
 
+## unpoller 5.10.1 - 2026-11-23
+
+- Update ghcr.io/unpoller/unpoller to v5.10.1
+  - Update Go to 1.27.4 and refresh modules
+  - CI maintenance (pin GitHub Actions, switch to Renovate)
+
 ## unpoller 5.10.0 - 2026-11-22
 
 - Update ghcr.io/unpoller/unpoller to v5.10.0
