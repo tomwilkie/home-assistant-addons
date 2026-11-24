@@ -55,7 +55,8 @@ jobs:
         with:
           python-version: "3.13"
       - name: Install linters
-        run: pip install yamllint==1.38.0 shellcheck-py==0.11.0.1
+        # Pinned in a requirements file so Renovate's pip manager updates them.
+        run: pip install -r .github/requirements-lint.txt
       - name: yamllint
         run: yamllint --strict --format github .
       - name: shellcheck
