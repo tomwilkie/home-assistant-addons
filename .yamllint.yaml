@@ -1,0 +1,11 @@
+---
+extends: default
+
+rules:
+  # Workflow prompts and add-on descriptions are prose; wrapping them hurts.
+  line-length: disable
+  # Some files start with "---" and some don't; both are fine.
+  document-start: disable
+  # GitHub Actions uses "on:" as a key.
+  truthy:
+    check-keys: false
