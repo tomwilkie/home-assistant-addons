@@ -1,0 +1,114 @@
+---
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  find:
+    name: Find add-ons
+    runs-on: ubuntu-24.04
+    outputs:
+      addons: ${{ steps.find.outputs.addons }}
+      builds: ${{ steps.find.outputs.builds }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - id: find
+        run: |
+          addons=$(ls -d */config.yaml | xargs -n1 dirname | jq -Rsc 'split("\n") | map(select(. != ""))')
+          builds=$(ls -d */Dockerfile | xargs -n1 dirname | jq -Rsc '
+            split("\n") | map(select(. != "")) |
+            [.[] as $a | {addon: $a, arch: "amd64", os: "ubuntu-24.04"},
+                         {addon: $a, arch: "aarch64", os: "ubuntu-24.04-arm"}]')
+          echo "addons=${addons}" >> "$GITHUB_OUTPUT"
+          echo "builds=${builds}" >> "$GITHUB_OUTPUT"
+
+  addon-lint:
+    name: Lint ${{ matrix.addon }} config
+    needs: find
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: ${{ fromJSON(needs.find.outputs.addons) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: frenck/action-addon-linter@d51677290aef26cdfc835271dd3c7343ce502809  # v2.21.2
+        with:
+          path: ./${{ matrix.addon }}
+
+  lint:
+    name: YAML, shell and add-on checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Install linters
+        # Pinned in a requirements file so Renovate's pip manager updates them.
+        run: pip install -r .github/requirements-lint.txt
+      - name: yamllint
+        run: yamllint --strict --format github .
+      - name: shellcheck
+        # The service scripts use a bashio shebang, which shellcheck doesn't
+        # recognise, so tell it they are bash.
+        run: shellcheck --shell=bash */rootfs/etc/services.d/*/* .github/scripts/*.sh
+      - name: Check versions and changelogs
+        # Renovate PRs get their changelog entry from the Renovate changelog
+        # workflow, whose commit does not re-run CI, so skip that check there.
+        run: |
+          if [[ "${HEAD_REF}" == renovate/* ]]; then
+            .github/scripts/check-addons.sh --skip-changelog
+          else
+            .github/scripts/check-addons.sh
+          fi
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+
+  hadolint:
+    name: Lint Dockerfiles
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: hadolint/hadolint-action@06be81baf89a55ffd0e24b8f04a4185738dd3387  # v3.5.0
+        with:
+          recursive: true
+
+  build:
+    name: Build ${{ matrix.addon }} (${{ matrix.arch }})
+    needs: find
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.find.outputs.builds) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Read version
+        id: version
+        run: |
+          version=$(sed -n 's/^version: *"\{0,1\}\([^"]*\)"\{0,1\} *$/\1/p' "${ADDON}/config.yaml")
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+        env:
+          ADDON: ${{ matrix.addon }}
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069  # v4.4.1
+      # Build the way the Supervisor does: it passes BUILD_ARCH and
+      # BUILD_VERSION (from config.yaml). Nothing is pushed.
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc  # v7.4.0
+        with:
+          context: ${{ matrix.addon }}
+          push: false
+          pull: true
+          build-args: |
+            BUILD_ARCH=${{ matrix.arch }}
+            BUILD_VERSION=${{ steps.version.outputs.version }}

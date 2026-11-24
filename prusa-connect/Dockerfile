@@ -8,11 +8,12 @@ FROM ${BUILD_FROM}
 ARG BUILD_VERSION
 ARG BUILD_ARCH
 
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+WORKDIR /tmp
 RUN set -eu; \
     [ -n "${BUILD_VERSION}" ] || { echo "BUILD_VERSION is required" >&2; exit 1; }; \
     base="https://github.com/prusa3d/prusa-connect/releases/download/v${BUILD_VERSION}"; \
     file="prusa_connect_${BUILD_ARCH}"; \
-    cd /tmp; \
     curl -fsSL -o "${file}" "${base}/${file}"; \
     curl -fsSL -o SHA256SUMS "${base}/SHA256SUMS"; \
     grep " ${file}$" SHA256SUMS | sha256sum -c -; \

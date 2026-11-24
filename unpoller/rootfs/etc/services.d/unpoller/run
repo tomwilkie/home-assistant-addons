@@ -13,4 +13,6 @@ if [ -z "$ENV_VARS" ]; then
 fi
 
 bashio::log.info "Starting Unpoller..."
+# ENV_VARS and CONFIG_ARGS are meant to split into separate words.
+# shellcheck disable=SC2086
 env ${ENV_VARS} /usr/local/bin/unpoller ${CONFIG_ARGS}

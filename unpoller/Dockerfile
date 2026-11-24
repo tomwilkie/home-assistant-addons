@@ -14,4 +14,7 @@ COPY rootfs /
 COPY --from=unpoller-base /usr/bin/unpoller /usr/local/bin/unpoller
 COPY --from=unpoller-base /etc/unpoller/up.conf /etc/unpoller/up.conf
 
+# Alpine drops old package versions from its repositories, so pinning one
+# would break the build on the next Alpine update.
+# hadolint ignore=DL3018
 RUN apk add --no-cache gomplate
