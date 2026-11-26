@@ -34,3 +34,9 @@ self-hosted server for 3D printers: the printers connect to it on your own
 network, and you use them from its web app and API. Prusa publishes no
 container image, so Home Assistant builds this add-on locally from the release
 binary on GitHub.
+
+### [UniFi MCP](./unifi_mcp)
+
+[UniFi MCP](https://github.com/sirkirby/unifi-mcp) servers plus the Cloud
+Relay in one container, so Claude can reach UniFi Network, Protect, Access and
+more. Home Assistant builds this add-on locally from its Dockerfile.
