@@ -1,0 +1,47 @@
+#!/usr/bin/with-contenv bashio
+# Runs one UniFi MCP server over HTTP on loopback. Usage: run-unifi-mcp <server>
+# shellcheck source=/dev/null
+source /usr/local/lib/unifi-mcp/common.sh
+
+server="${1}"
+port="$(unifi_mcp_port "${server}")"
+
+if ! bashio::config.true "${server}"; then
+  bashio::log.info "UniFi ${server} MCP server is disabled"
+  exec sleep infinity
+fi
+
+# HTTP only, on loopback: the relay is the only client.
+export UNIFI_MCP_HTTP_ENABLED=true
+export UNIFI_MCP_HTTP_FORCE=true
+export UNIFI_MCP_STDIO_ENABLED=false
+export UNIFI_MCP_HTTP_TRANSPORT=streamable-http
+export UNIFI_MCP_HOST=127.0.0.1
+export UNIFI_MCP_PORT="${port}"
+export UNIFI_MCP_ALLOWED_HOSTS="localhost,localhost:${port},127.0.0.1,127.0.0.1:${port}"
+
+case "${server}" in
+  sitemanager)
+    # Site Manager never uses the shared console login.
+    UNIFI_SITEMANAGER_API_KEY="$(bashio::config 'sitemanager_api_key')"
+    export UNIFI_SITEMANAGER_API_KEY
+    ;;
+  drive)
+    # A UniFi NAS is its own console with its own local login.
+    UNIFI_DRIVE_HOST="$(bashio::config 'drive_host')"
+    UNIFI_DRIVE_USERNAME="$(bashio::config 'drive_username')"
+    UNIFI_DRIVE_PASSWORD="$(bashio::config 'drive_password')"
+    UNIFI_DRIVE_VERIFY_SSL="$(bashio::config 'unifi_verify_ssl')"
+    export UNIFI_DRIVE_HOST UNIFI_DRIVE_USERNAME UNIFI_DRIVE_PASSWORD UNIFI_DRIVE_VERIFY_SSL
+    ;;
+  *)
+    UNIFI_HOST="$(bashio::config 'unifi_host')"
+    UNIFI_USERNAME="$(bashio::config 'unifi_username')"
+    UNIFI_PASSWORD="$(bashio::config 'unifi_password')"
+    UNIFI_VERIFY_SSL="$(bashio::config 'unifi_verify_ssl')"
+    export UNIFI_HOST UNIFI_USERNAME UNIFI_PASSWORD UNIFI_VERIFY_SSL
+    ;;
+esac
+
+bashio::log.info "Starting UniFi ${server} MCP server on 127.0.0.1:${port}..."
+exec "unifi-${server}-mcp"

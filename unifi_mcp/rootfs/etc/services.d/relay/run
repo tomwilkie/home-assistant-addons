@@ -1,0 +1,26 @@
+#!/usr/bin/with-contenv bashio
+# shellcheck source=/dev/null
+source /usr/local/lib/unifi-mcp/common.sh
+
+servers=()
+for server in network protect access sitemanager drive innerspace; do
+  if bashio::config.true "${server}"; then
+    port="$(unifi_mcp_port "${server}")"
+    bashio::log.info "Waiting for UniFi ${server} MCP server..."
+    bashio::net.wait_for "${port}" 127.0.0.1 300
+    servers+=("http://127.0.0.1:${port}")
+  fi
+done
+
+if [[ ${#servers[@]} -eq 0 ]]; then
+  bashio::exit.nok "No UniFi MCP servers are enabled"
+fi
+
+UNIFI_RELAY_URL="$(bashio::config 'relay_url')"
+UNIFI_RELAY_TOKEN="$(bashio::config 'relay_token')"
+UNIFI_RELAY_LOCATION_NAME="$(bashio::config 'relay_location_name')"
+UNIFI_RELAY_SERVERS="$(IFS=,; echo "${servers[*]}")"
+export UNIFI_RELAY_URL UNIFI_RELAY_TOKEN UNIFI_RELAY_LOCATION_NAME UNIFI_RELAY_SERVERS
+
+bashio::log.info "Starting UniFi MCP relay for ${UNIFI_RELAY_SERVERS}..."
+exec unifi-mcp-relay

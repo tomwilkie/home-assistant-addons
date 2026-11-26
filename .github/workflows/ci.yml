@@ -60,9 +60,10 @@ jobs:
       - name: yamllint
         run: yamllint --strict --format github .
       - name: shellcheck
-        # The service scripts use a bashio shebang, which shellcheck doesn't
-        # recognise, so tell it they are bash.
-        run: shellcheck --shell=bash */rootfs/etc/services.d/*/* .github/scripts/*.sh
+        # Every file under an add-on's rootfs is a shell script: s6 service
+        # scripts and the helpers they call. Some use a bashio shebang, which
+        # shellcheck doesn't recognise, so tell it they are bash.
+        run: find */rootfs -type f -print0 | xargs -0 shellcheck --shell=bash .github/scripts/*.sh
       - name: Check versions and changelogs
         # Renovate PRs get their changelog entry from the Renovate changelog
         # workflow, whose commit does not re-run CI, so skip that check there.
