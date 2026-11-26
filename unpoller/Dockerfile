@@ -1,4 +1,4 @@
-FROM ghcr.io/unpoller/unpoller:v5.10.1 AS unpoller-base
+FROM ghcr.io/unpoller/unpoller:v5.10.2 AS unpoller-base
 FROM ghcr.io/home-assistant/base:3.24 AS final
 
 LABEL \
