@@ -1,14 +1,34 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": ["config:recommended", "customManagers:dockerfileVersions"],
   "customManagers": [
     {
       "customType": "regex",
       "managerFilePatterns": ["/(^|/)config\\.yaml$/"],
       "matchStrings": ["# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\nversion: \"?(?<currentValue>[^\"\\s]+)\"?"],
       "extractVersionTemplate": "^v?(?<version>.*)$"
+    },
+    {
+      "description": "Values in workflows marked with a renovate comment, such as a checkout ref",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/"],
+      "matchStrings": ["# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n\\s+[\\w-]+: \"?(?<currentValue>[^\"\\s]+)\"?"]
+    },
+    {
+      "description": "Runner labels in workflow matrices, which Renovate can't read through runs-on",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/"],
+      "matchStrings": ["runner: (?<depName>ubuntu)-(?<currentValue>\\S+)"],
+      "datasourceTemplate": "github-runners",
+      "versioningTemplate": "docker"
     }
   ],
+  "pip-compile": {
+    "managerFilePatterns": ["/(^|/)unifi_mcp/requirements/[^/]+\\.txt$/"]
+  },
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "packageRules": [
     {
       "matchPackageNames": ["ghcr.io/unpoller/unpoller"],
@@ -17,6 +37,11 @@
     {
       "matchPackageNames": ["homebridge/homebridge"],
       "versioning": "regex:^(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})$"
+    },
+    {
+      "description": "Tags are <alpine>-<release>, e.g. 3.24-2026.11.1",
+      "matchPackageNames": ["ghcr.io/home-assistant/base"],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)-(?<patch>\\d+)\\.(?<build>\\d+)\\.(?<revision>\\d+)$"
     }
   ]
 }

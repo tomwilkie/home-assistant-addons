@@ -25,10 +25,7 @@ jobs:
       - id: find
         run: |
           addons=$(ls -d */config.yaml | xargs -n1 dirname | jq -Rsc 'split("\n") | map(select(. != ""))')
-          builds=$(ls -d */Dockerfile | xargs -n1 dirname | jq -Rsc '
-            split("\n") | map(select(. != "")) |
-            [.[] as $a | {addon: $a, arch: "amd64", os: "ubuntu-24.04"},
-                         {addon: $a, arch: "aarch64", os: "ubuntu-24.04-arm"}]')
+          builds=$(ls -d */Dockerfile | xargs -n1 dirname | jq -Rsc 'split("\n") | map(select(. != ""))')
           echo "addons=${addons}" >> "$GITHUB_OUTPUT"
           echo "builds=${builds}" >> "$GITHUB_OUTPUT"
 
@@ -53,7 +50,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
-          python-version: "3.15"
+          python-version: "3.15.2"
       - name: Install linters
         # Pinned in a requirements file so Renovate's pip manager updates them.
         run: pip install -r .github/requirements-lint.txt
@@ -86,13 +83,20 @@ jobs:
           recursive: true
 
   build:
-    name: Build ${{ matrix.addon }} (${{ matrix.arch }})
+    name: Build ${{ matrix.addon }} (${{ matrix.platform.arch }})
     needs: find
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform.runner }}
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.find.outputs.builds) }}
+        addon: ${{ fromJSON(needs.find.outputs.builds) }}
+        # Renovate can't read runs-on through the matrix, so a custom manager
+        # in renovate.json tracks these runner labels.
+        platform:
+          - arch: amd64
+            runner: ubuntu-26.04
+          - arch: aarch64
+            runner: ubuntu-26.04-arm
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: Read version
@@ -111,5 +115,5 @@ jobs:
           push: false
           pull: true
           build-args: |
-            BUILD_ARCH=${{ matrix.arch }}
+            BUILD_ARCH=${{ matrix.platform.arch }}
             BUILD_VERSION=${{ steps.version.outputs.version }}

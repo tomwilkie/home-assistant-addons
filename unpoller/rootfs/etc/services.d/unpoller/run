@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bashio
 
 CONFIG_PATH=$(bashio::config 'dynamic_configuration_path')
-ENV_VARS=$(gomplate -d options=/data/options.json -i '{{ range (ds "options").env_vars }}{{ . }} {{ end }}')
+ENV_VARS=$(jq -r '.env_vars // [] | join(" ")' /data/options.json)
 
 CONFIG_ARGS=""
 if [ -f "${CONFIG_PATH}" ]; then
