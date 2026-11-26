@@ -1,5 +1,11 @@
 # Changelog
 
+## unpoller 5.10.2 - 2026-11-26
+
+- Update ghcr.io/unpoller/unpoller to v5.10.2
+  - Fix exporting UDM WiFi radio and VAP metrics without stat.ap (promunifi)
+  - Pin dependencies
+
 ## unpoller 5.10.1 - 2026-11-23
 
 - Update ghcr.io/unpoller/unpoller to v5.10.1
