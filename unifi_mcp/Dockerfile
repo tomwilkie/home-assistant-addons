@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:0.9 AS uv
+FROM ghcr.io/astral-sh/uv:0.13 AS uv
 FROM ghcr.io/home-assistant/base:3.24
 
 ARG PYTHON_VERSION=3.13
