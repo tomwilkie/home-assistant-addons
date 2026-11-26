@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/base:3.24
+ARG BUILD_FROM=ghcr.io/home-assistant/base:3.24-2026.11.1
 FROM ${BUILD_FROM}
 
 # Prusa publishes no container image, only static Linux binaries on each

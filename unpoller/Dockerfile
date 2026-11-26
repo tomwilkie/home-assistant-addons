@@ -1,5 +1,5 @@
 FROM ghcr.io/unpoller/unpoller:v5.10.2 AS unpoller-base
-FROM ghcr.io/home-assistant/base:3.24 AS final
+FROM ghcr.io/home-assistant/base:3.24-2026.11.1 AS final
 
 LABEL \
   maintainer="bluemaex <homeassistant@blmx.de>" \
@@ -13,8 +13,3 @@ LABEL \
 COPY rootfs /
 COPY --from=unpoller-base /usr/bin/unpoller /usr/local/bin/unpoller
 COPY --from=unpoller-base /etc/unpoller/up.conf /etc/unpoller/up.conf
-
-# Alpine drops old package versions from its repositories, so pinning one
-# would break the build on the next Alpine update.
-# hadolint ignore=DL3018
-RUN apk add --no-cache gomplate

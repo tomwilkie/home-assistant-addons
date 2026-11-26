@@ -1,14 +1,8 @@
-FROM ghcr.io/astral-sh/uv:0.13 AS uv
-FROM ghcr.io/home-assistant/base:3.24
+FROM ghcr.io/astral-sh/uv:0.13.10 AS uv
+FROM ghcr.io/home-assistant/base:3.24-2026.11.1
 
-ARG PYTHON_VERSION=3.13
-ARG UNIFI_NETWORK_MCP_VERSION=0.50.3
-ARG UNIFI_PROTECT_MCP_VERSION=0.15.1
-ARG UNIFI_ACCESS_MCP_VERSION=0.10.1
-ARG UNIFI_SITEMANAGER_MCP_VERSION=0.2.1
-ARG UNIFI_DRIVE_MCP_VERSION=0.1.0
-ARG UNIFI_INNERSPACE_MCP_VERSION=0.1.1
-ARG UNIFI_MCP_RELAY_VERSION=0.3.22
+# renovate: datasource=python-version depName=python
+ARG PYTHON_VERSION=3.13.18
 
 ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python \
     UV_TOOL_DIR=/opt/uv/tools \
@@ -19,17 +13,14 @@ ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python \
 
 COPY --from=uv /uv /usr/local/bin/uv
 
-# Each server gets its own venv so their pinned dependencies can't clash.
+# Each server gets its own venv so their dependencies can't clash. Each one's
+# full dependency tree is locked in requirements/<package>.txt, compiled from
+# requirements/<package>.in; Renovate updates both.
+COPY requirements /tmp/requirements
 RUN uv python install "${PYTHON_VERSION}" \
- && for pkg in \
-      "unifi-network-mcp==${UNIFI_NETWORK_MCP_VERSION}" \
-      "unifi-protect-mcp==${UNIFI_PROTECT_MCP_VERSION}" \
-      "unifi-access-mcp==${UNIFI_ACCESS_MCP_VERSION}" \
-      "unifi-sitemanager-mcp==${UNIFI_SITEMANAGER_MCP_VERSION}" \
-      "unifi-drive-mcp==${UNIFI_DRIVE_MCP_VERSION}" \
-      "unifi-innerspace-mcp==${UNIFI_INNERSPACE_MCP_VERSION}" \
-      "unifi-mcp-relay==${UNIFI_MCP_RELAY_VERSION}"; do \
-      uv tool install --python "${PYTHON_VERSION}" "${pkg}" || exit 1; \
-    done
+ && for req in /tmp/requirements/*.txt; do \
+      uv tool install --python "${PYTHON_VERSION}" --constraints "${req}" "$(basename "${req}" .txt)" || exit 1; \
+    done \
+ && rm -rf /tmp/requirements
 
 COPY rootfs /
