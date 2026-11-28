@@ -2,7 +2,7 @@ FROM ghcr.io/astral-sh/uv:0.13.10 AS uv
 FROM ghcr.io/home-assistant/base:3.24-2026.11.1
 
 # renovate: datasource=python-version depName=python
-ARG PYTHON_VERSION=3.13.18
+ARG PYTHON_VERSION=3.15.2
 
 ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python \
     UV_TOOL_DIR=/opt/uv/tools \
