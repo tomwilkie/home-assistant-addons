@@ -1,6 +1,6 @@
 ---
 name: UniFi MCP
-version: 0.1.0
+version: 0.1.1
 slug: unifi_mcp
 description: |
   UniFi MCP servers (Network, Protect, Access and more) with the Cloud Relay, so cloud agents such as Claude can reach your UniFi consoles.
