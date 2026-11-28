@@ -8,20 +8,28 @@ permissions:
   id-token: write
 jobs:
   changelog:
-    if: startsWith(github.head_ref, 'renovate/')
+    # Only on Renovate's own pushes, so the app's changelog commit doesn't
+    # start this job again.
+    if: startsWith(github.head_ref, 'renovate/') && github.actor == 'renovate[bot]'
     runs-on: ubuntu-26.04
     steps:
+      # Push as the GitHub App rather than with GITHUB_TOKEN: pushes made as
+      # github-actions[bot] leave CI on the new commit waiting for approval.
+      - uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc  # v3.4.0
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           ref: ${{ github.head_ref }}
+          token: ${{ steps.app-token.outputs.token }}
           # Full history so the job can diff the PR against main.
           fetch-depth: 0
       - uses: anthropics/claude-code-action@4411a9e9b0283becf4b924f7bce360fd7756c78c  # v1.0.290
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          # Push with the job's own token so the changelog commit does not
-          # trigger a second round of workflow runs as github-actions[bot].
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
           allowed_bots: 'renovate'
           claude_args: '--allowedTools "Edit,Bash(gh release view:*),Bash(git diff:*),Bash(git show:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*)"'
           prompt: |
