@@ -14,6 +14,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           ref: ${{ github.head_ref }}
+          # Full history so the job can diff the PR against main.
+          fetch-depth: 0
       - uses: anthropics/claude-code-action@4411a9e9b0283becf4b924f7bce360fd7756c78c  # v1.0.290
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -21,13 +23,28 @@ jobs:
           # trigger a second round of workflow runs as github-actions[bot].
           github_token: ${{ secrets.GITHUB_TOKEN }}
           allowed_bots: 'renovate'
-          claude_args: '--allowedTools "Edit,Bash(gh release view:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*)"'
+          claude_args: '--allowedTools "Edit,Bash(gh release view:*),Bash(git diff:*),Bash(git show:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*)"'
           prompt: |
-            This Renovate PR bumps an add-on version in */config.yaml.
+            Run `git diff --name-only origin/main...HEAD` to see which files this Renovate PR changes,
+            then handle whichever case applies.
+
+            Case 1: the PR bumps an add-on version in */config.yaml.
             If that add-on's CHANGELOG.md has no entry for the new version, add one at the top
             matching the existing format, summarising the upstream release notes
             (gh release view <tag> -R <upstream repo>). Upstream repos:
             - unpoller: unpoller/unpoller
             - homebridge: homebridge/docker-homebridge
             - prusa-connect: prusa3d/prusa-connect
-            Commit and push to this branch.
+
+            Case 2: the PR changes only */Dockerfile files (no config.yaml).
+            The Supervisor only offers an update when the add-on version changes, so for each
+            add-on whose Dockerfile changed:
+            - If its config.yaml `version:` already differs from origin/main
+              (git diff origin/main...HEAD -- <addon>/config.yaml), it has been bumped; do nothing.
+            - Otherwise bump the patch part of `version:` in <addon>/config.yaml (e.g. 0.1.0 -> 0.1.1)
+              and add an entry for the new version at the top of <addon>/CHANGELOG.md, matching the
+              existing format, with today's date and one line per dependency changed, e.g.
+              "- Update python from 3.13.18 to 3.13.19". Take the names and versions from the diff.
+
+            If neither case applies, or nothing needs changing, stop without committing.
+            Otherwise commit and push to this branch.
