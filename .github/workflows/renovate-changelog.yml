@@ -36,15 +36,20 @@ jobs:
             - homebridge: homebridge/docker-homebridge
             - prusa-connect: prusa3d/prusa-connect
 
-            Case 2: the PR changes only */Dockerfile files (no config.yaml).
-            The Supervisor only offers an update when the add-on version changes, so for each
-            add-on whose Dockerfile changed:
+            Case 2: the PR changes files inside an add-on directory (a top-level directory with a
+            config.yaml, e.g. its Dockerfile or unifi_mcp/requirements/*) without bumping that
+            add-on's `version:`. These changes ship in the add-on, but the Supervisor only offers
+            an update when the version changes, so for each such add-on:
             - If its config.yaml `version:` already differs from origin/main
               (git diff origin/main...HEAD -- <addon>/config.yaml), it has been bumped; do nothing.
             - Otherwise bump the patch part of `version:` in <addon>/config.yaml (e.g. 0.1.0 -> 0.1.1)
               and add an entry for the new version at the top of <addon>/CHANGELOG.md, matching the
               existing format, with today's date and one line per dependency changed, e.g.
               "- Update python from 3.13.18 to 3.13.19". Take the names and versions from the diff.
+              For lockfile changes, list the packages that changed version in the *.txt files.
+
+            Changes outside add-on directories (.github/, renovate.json and other repo-root files)
+            are CI and tooling only; they never need a version bump or changelog entry.
 
             If neither case applies, or nothing needs changing, stop without committing.
             Otherwise commit and push to this branch.
