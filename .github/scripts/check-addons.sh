@@ -2,7 +2,7 @@
 # Checks that each add-on's files agree with its config.yaml:
 #   - the top CHANGELOG.md entry is for the current version
 #   - a Dockerfile that pulls the upstream image Renovate tracks uses the
-#     same tag as config.yaml's version
+#     same tag as config.yaml's version, ignoring any -N add-on revision
 # Pass --skip-changelog to skip the first check.
 set -euo pipefail
 
@@ -30,10 +30,15 @@ for config in */config.yaml; do
   fi
 
   dockerfile="${dir}/Dockerfile"
-  image=$(sed -n 's/^# renovate: datasource=docker depName=\(.*\)$/\1/p' "${config}")
+  image=$(sed -n 's/^# renovate: datasource=docker depName=\([^ ]*\).*$/\1/p' "${config}")
   if [[ -f "${dockerfile}" && -n "${image}" ]]; then
     tag=$(sed -n "s|^FROM ${image}:\([^ @]*\).*|\1|p" "${dockerfile}")
-    if [[ -n "${tag}" && "${tag#v}" != "${version}" ]]; then
+    # Allow an add-on revision suffix, e.g. 5.10.2-1 for upstream 5.10.2.
+    upstream="${version}"
+    if [[ "${version}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-[0-9]+$ ]]; then
+      upstream="${BASH_REMATCH[1]}"
+    fi
+    if [[ -n "${tag}" && "${tag#v}" != "${upstream}" ]]; then
       fail "${dockerfile}" "FROM ${image}:${tag} does not match config.yaml version ${version}"
     fi
   fi

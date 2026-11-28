@@ -9,6 +9,14 @@
       "extractVersionTemplate": "^v?(?<version>.*)$"
     },
     {
+      "description": "Add-on versions with an optional -N add-on revision, marked revision=true; a bump drops the revision",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)config\\.yaml$/"],
+      "matchStrings": ["# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+) revision=true\\nversion: (?<currentValue>\\d+\\.\\d+\\.\\d+)(?:-\\d+)?\\n"],
+      "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}} revision=true\nversion: {{{newValue}}}\n",
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    },
+    {
       "description": "Values in workflows marked with a renovate comment, such as a checkout ref",
       "customType": "regex",
       "managerFilePatterns": ["/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/"],

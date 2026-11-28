@@ -3,9 +3,20 @@
 CONFIG_PATH=$(bashio::config 'dynamic_configuration_path')
 ENV_VARS=$(jq -r '.env_vars // [] | join(" ")' /data/options.json)
 
+# Before 5.10.2-1 the add-on mapped all of Home Assistant's config and the
+# default path was /config/addons/unpoller/up.conf. That folder is no longer
+# mapped, so point the old default at the add-on's own config folder.
+if [ "${CONFIG_PATH}" = "/config/addons/unpoller/up.conf" ]; then
+    bashio::log.warning "dynamic_configuration_path is the old default ${CONFIG_PATH}; using /config/up.conf. Move up.conf to /addon_configs/<id>_unpoller/ and update the option."
+    CONFIG_PATH="/config/up.conf"
+fi
+
 CONFIG_ARGS=""
 if [ -f "${CONFIG_PATH}" ]; then
+    bashio::log.info "Using config file ${CONFIG_PATH}"
     CONFIG_ARGS="--config ${CONFIG_PATH}"
+elif [ -n "${CONFIG_PATH}" ]; then
+    bashio::log.info "No config file at ${CONFIG_PATH}; using environment variables only"
 fi
 
 if [ -z "$ENV_VARS" ]; then
