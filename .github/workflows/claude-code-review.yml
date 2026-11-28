@@ -12,6 +12,9 @@ on:
 
 jobs:
   claude-review:
+    # Skip pushes by other bots, such as the Renovate changelog job's app;
+    # the action would refuse them as bots not in allowed_bots.
+    if: ${{ !endsWith(github.actor, '[bot]') || github.actor == 'renovate[bot]' }}
     # Optional: Filter by PR author
     # if: |
     #   github.event.pull_request.user.login == 'external-contributor' ||
