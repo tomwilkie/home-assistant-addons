@@ -1,7 +1,9 @@
 ---
 name: UnPoller
-# renovate: datasource=docker depName=ghcr.io/unpoller/unpoller
-version: 5.10.2
+# Upstream version, plus an optional -N add-on revision for changes that ship
+# without a new upstream release. Renovate drops the revision when it bumps.
+# renovate: datasource=docker depName=ghcr.io/unpoller/unpoller revision=true
+version: 5.10.2-1
 slug: unpoller
 description: |
   Collect your UniFi controller data and report it to an InfluxDB instance, or export it for Prometheus collection.
@@ -17,11 +19,11 @@ ports_description:
   9130/tcp: Unpoller Prometheus Endpoint
 panel_icon: mdi:router-network
 map:
-  - type: homeassistant_config
+  - type: app_config
     path: /config
 options:
   log_level: info
-  dynamic_configuration_path: "/config/addons/unpoller/up.conf"
+  dynamic_configuration_path: "/config/up.conf"
   env_vars: []
 schema:
   log_level: list(trace|debug|info|notice|warning|error|fatal)

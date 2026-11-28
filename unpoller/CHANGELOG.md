@@ -1,5 +1,13 @@
 # Changelog
 
+## unpoller 5.10.2-1 - 2026-11-28
+
+- Read the config file from the add-on's own config folder
+  (`/addon_configs/<id>_unpoller/`) instead of mapping all of Home Assistant's
+  config. The default `dynamic_configuration_path` is now `/config/up.conf`.
+  - If you use a config file, move `up.conf` from `/config/addons/unpoller/` to
+    `/addon_configs/<id>_unpoller/` before updating. See the documentation.
+
 ## unpoller 5.10.2 - 2026-11-26
 
 - Update ghcr.io/unpoller/unpoller to v5.10.2
