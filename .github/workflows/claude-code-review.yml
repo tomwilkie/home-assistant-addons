@@ -31,24 +31,17 @@ jobs:
         with:
           fetch-depth: 1
 
-      # The action only takes a marketplace as a Git URL (always the default
-      # branch) or a local path, so check out a pinned release and use that.
-      - name: Checkout plugin marketplace
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          repository: anthropics/claude-code
-          # renovate: datasource=github-tags depName=anthropics/claude-code
-          ref: v2.1.332
-          path: .claude-marketplace
-          persist-credentials: false
-
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@4411a9e9b0283becf4b924f7bce360fd7756c78c  # v1.0.290
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: 'renovate'
-          plugin_marketplaces: './.claude-marketplace'
+          # Not pinned: the action only takes a marketplace as a Git URL (always
+          # the default branch) or a local path, and a local checkout can't be
+          # used because the 'claude-code-plugins' name is reserved for
+          # marketplaces loaded from the anthropics GitHub org.
+          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: '/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
           claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment"'
